@@ -1,22 +1,39 @@
 import express, { Request, Response } from 'express'
-import { productsRouter } from './routers/products-router';
-import { runDb } from './repositories/db';
 
 const app = express()
 const port = process.env.PORT || 5000
 
-const parserMiddleware = express.json()
-app.use(parserMiddleware)
-
+const db = {
+    courses:[
+    {id: 1, title: 'front-end'},
+    {id: 2, title: 'back-end'},
+    {id: 3, title: 'react'}
+  ]
+}
 
 app.get('/', (req: Request, res: Response) => {
-  res.send('Hello Samurai')
+  res.send({message:'Hello Samurai'})
 })
 
-app.use('/products', productsRouter)
+app.get('/courses', (req: Request, res: Response) => {
+  
+  res.json(db.courses)
+})
+
+app.get('/courses/:id', (req: Request, res: Response) => {
+  const course = db.courses.find(c => c.id === +req.params.id)
+
+  if(!course) {
+    res.sendStatus(404)
+
+    return
+  }
+  res.json(course)
+})
+
 
 const startApp = async () => {
-  await runDb()
+  
   app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
   })
